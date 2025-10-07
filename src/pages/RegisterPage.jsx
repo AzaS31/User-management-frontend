@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Alert, Spinner } from 'react-bootstrap';
 import api from '../utils/api';
 
 function RegisterPage() {
@@ -8,19 +8,27 @@ function RegisterPage() {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError('');
+        setMessage('');
         try {
             const res = await api.post('/auth/register', { name, email, password });
             setMessage(res.data.message);
-            setError('');
             setName('');
             setEmail('');
             setPassword('');
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed');
-            setMessage('');
+            if (!err.response) {
+                setError('Server is asleep or unavailable. Please try again.');
+            } else {
+                setError(err.response.data?.message || 'Registration failed');
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -66,8 +74,20 @@ function RegisterPage() {
                                 />
                             </Form.Group>
 
-                            <Button type="submit" className="w-100 register-btn">
-                                Register
+                            <Button type="submit" className="w-100 register-btn" disabled={loading}>
+                                {loading ? (
+                                    <>
+                                        <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                        /> Loading...
+                                    </>
+                                ) : (
+                                    'Register'
+                                )}
                             </Button>
                         </Form>
                         <div className="text-center mt-3">

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Alert, Spinner } from 'react-bootstrap';
 import api from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,20 +7,25 @@ function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError('');
         try {
-            const res = await api.post(
-                '/auth/login',
-                { email, password },
-            );
-            setError('');
+            const res = await api.post('/auth/login', { email, password });
             localStorage.setItem('user', JSON.stringify(res.data.user));
             navigate('/admin');
         } catch (err) {
-            setError(err.response?.data?.message || 'Login failed');
+            if (!err.response) {
+                setError('Server is asleep or unavailable. Please try again.');
+            } else {
+                setError(err.response.data?.message || 'Login failed');
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -54,8 +59,20 @@ function LoginPage() {
                                 />
                             </Form.Group>
 
-                            <Button type="submit" className="w-100 login-btn">
-                                Login
+                            <Button type="submit" className="w-100 login-btn" disabled={loading}>
+                                {loading ? (
+                                    <>
+                                        <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                        /> Loading...
+                                    </>
+                                ) : (
+                                    'Login'
+                                )}
                             </Button>
                         </Form>
                         <div className="text-center mt-3">
