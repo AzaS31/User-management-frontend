@@ -16,6 +16,7 @@ function LoginPage() {
                 '/auth/login',
                 { email, password },
             );
+            setError('');
             localStorage.setItem('user', JSON.stringify(res.data.user));
             navigate('/admin');
         } catch (err) {
