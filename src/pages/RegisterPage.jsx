@@ -24,8 +24,10 @@ function RegisterPage() {
         } catch (err) {
             if (!err.response) {
                 setError('Server is asleep or unavailable. Please try again.');
+            } else if (err.response.data?.message) {
+                setError(err.response.data.message);
             } else {
-                setError(err.response.data?.message || 'Registration failed');
+                setError('Registration failed');
             }
         } finally {
             setLoading(false);

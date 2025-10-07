@@ -21,8 +21,12 @@ function LoginPage() {
         } catch (err) {
             if (!err.response) {
                 setError('Server is asleep or unavailable. Please try again.');
-            } else {
-                setError(err.response.data?.message || 'Login failed');
+            }
+            else if (err.response.data?.message) {
+                setError(err.response.data.message);
+            }
+            else {
+                setError('Login failed');
             }
         } finally {
             setLoading(false);
