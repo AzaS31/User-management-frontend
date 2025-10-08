@@ -16,6 +16,8 @@ function LoginPage() {
         setError('');
         try {
             const res = await api.post('/auth/login', { email, password });
+
+            localStorage.setItem('token', res.data.token);
             localStorage.setItem('user', JSON.stringify(res.data.user));
             navigate('/admin');
         } catch (err) {
@@ -28,6 +30,7 @@ function LoginPage() {
             setLoading(false);
         }
     };
+
 
     return (
         <Container className="login-container">

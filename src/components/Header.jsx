@@ -13,13 +13,8 @@ const Header = () => {
     }, []);
 
     // Nota Bene: handleLogout clears localStorage, resets state, and navigates to login
-    const handleLogout = async () => {
-        try {
-            await api.post('/auth/logout');
-        } catch (err) {
-            console.error('Logout error:', err);
-        }
-
+    const handleLogout = () => {
+        localStorage.removeItem('token');
         localStorage.removeItem('user');
         setUser(null);
         navigate('/login');
